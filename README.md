@@ -114,6 +114,6 @@ Assuming you've installed git-deploy support as described in the Installation se
 
 ```bash
 git deploy start
-<git changes you'd like to make>
+<git changes you would like to make>
 git deploy sync
 ```
