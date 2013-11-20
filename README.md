@@ -97,6 +97,38 @@ All of Trebuchet is configured using Salt Pillars. Two pillars are used, deploym
 
   A boolean that defines whether or not this repository is automatically or manually deployed. This is used by the git-deploy hooks and is otherwise unused.
 
+Configuration Example
+---------------------
+
+The following configuration will configure two repositories: mediawiki/slot0 and test/testrepo. Each repository will exist under /srv/deployment on both the deployment server (deployment-west.example.org) and all deployment targets with a matching grain.
+
+Note: It's possible to break this pillar configuration into multiple files and include the configuration on sets of deployment targets, to limit the ability for a target to access a repo. To do so, you'll need to use the extend support for pillars available in the current development release.
+
+```yaml
+deployment_config:
+  parent_dir: /srv/deployment
+  servers:
+    uswest: deployment-west.example.org
+  redis:
+    host: deployment-west.example.org
+    db: 0
+    port: 6379
+repo_config:
+  test/testrepo:
+    grain: test
+  mediawiki/slot0:
+    grain: mediawiki
+    upstream: https://gerrit.wikimedia.org/r/p/mediawiki/core
+    shadow_reference: true
+    checkout_submodules: true
+    fetch_module_calls:
+      mediawiki.generate_localization_cache:
+        - __REPO__
+    checkout_module_calls:
+      mediawiki.update_localization_cache:
+        - __REPO__
+```
+
 Usage
 -----
 
