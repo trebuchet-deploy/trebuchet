@@ -132,20 +132,16 @@ repo_config:
 Usage
 -----
 
-Currently Trebuchet must be used in combination with a deployment frontend called git-deploy:
+Trebuchet currently must be used in combination with Trebuchet Trigger:
 
-  https://github.com/git-deploy/git-deploy
-
-Soon it will also be usable with the python fork of git-deploy:
-
-  https://github.com/Git-Tools/git-deploy
+  https://github.com/trebuchet-deploy/trigger
 
 Future plans will allow the use of Trebuchet through a web frontend, or directly using git in a Heroku-like workflow.
 
-Assuming you've installed git-deploy support as described in the Installation section, the basic use of trebuchet is controlled through git-deploy:
+Assuming you've installed trigger support as described in trigger's Installation section, the basic use of trebuchet is controlled through trigger:
 
 ```bash
-git deploy start
+git trigger start
 <git changes you would like to make>
-git deploy sync
+git trigger sync
 ```
