@@ -145,3 +145,9 @@ git trigger start
 <git changes you would like to make>
 git trigger sync
 ```
+
+Getting Help
+------------
+
+For bugs, please use the github issues tracker for this project. To discuss usage or developme
+nt of trigger, please join me on #trebuchet-deploy on Freenode.
