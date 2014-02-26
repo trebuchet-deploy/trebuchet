@@ -1,7 +1,7 @@
 Trebuchet
 =========
 
-Trebuchet is a two-phase deployment system with reporting implemented using Salt Stack. Its primary transportation method uses git.
+Trebuchet is a two-phase deployment system with reporting implemented using [SaltStack](http://www.saltstack.com/). Its primary transportation method uses git.
 
 Design
 ------
@@ -11,14 +11,14 @@ See the [design documentation at Wikimedia's Wikitech wiki](https://wikitech.wik
 Prerequisites
 -------------
 
-Salt Stack is a hard requirement.
+SaltStack is a hard requirement.
 
 A mininum of two nodes is required: salt master/deployment server and a deployment target. It is recommended to use three nodes, splitting the salt master apart from the deployment server.
 
 Installation
 ------------
 
-### Using Salt Stack ###
+### Using SaltStack ###
 
 Include the salt states, based on the node type:
 
