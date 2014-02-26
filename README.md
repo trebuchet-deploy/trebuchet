@@ -6,14 +6,14 @@ Trebuchet is a two-phase deployment system with reporting implemented using Salt
 Design
 ------
 
-TODO: Add design documentation
+See the [design documentation at Wikimedia's Wikitech wiki](https://wikitech.wikimedia.org/wiki/Trebuchet/Design).
 
 Prerequisites
 -------------
 
 Salt Stack is a hard requirement.
 
-A mininum of two nodes is required: salt master/deployment server and a deployment target. It is recommended that the salt master is split apart from the deployment server.
+A mininum of two nodes is required: salt master/deployment server and a deployment target. It is recommended to use three nodes, splitting the salt master apart from the deployment server.
 
 Installation
 ------------
@@ -132,11 +132,7 @@ repo_config:
 Usage
 -----
 
-Trebuchet currently must be used in combination with Trebuchet Trigger:
-
-  https://github.com/trebuchet-deploy/trigger
-
-Future plans will allow the use of Trebuchet through a web frontend, or directly using git in a Heroku-like workflow.
+It it currently easiest to interact with Trebuchet using [Trebuchet Trigger](https://github.com/trebuchet-deploy/trigger), a git interface. Future plans will allow the use of Trebuchet through the [Trebuchet Ricochet](https://github.com/trebuchet-deploy/ricochet) web frontend.
 
 Assuming you've installed trigger support as described in trigger's Installation section, the basic use of trebuchet is controlled through trigger:
 
