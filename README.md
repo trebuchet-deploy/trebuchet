@@ -137,9 +137,9 @@ It it currently easiest to interact with Trebuchet using [Trebuchet Trigger](htt
 Assuming you've installed trigger support as described in trigger's Installation section, the basic use of trebuchet is controlled through trigger:
 
 ```bash
-git trigger start
+git deploy start
 <git changes you would like to make>
-git trigger sync
+git deploy sync
 ```
 
 Getting Help
