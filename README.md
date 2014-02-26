@@ -142,8 +142,12 @@ git deploy start
 git deploy sync
 ```
 
+External Documentation
+----------------------
+
+Wikimedia Foundation is currently using Trebuchet for deployment, and has [more detailed documentation](https://wikitech.wikimedia.org/wiki/Trebuchet) that is specific to their use case.
+
 Getting Help
 ------------
 
-For bugs, please use the github issues tracker for this project. To discuss usage or developme
-nt of trigger, please join me on #trebuchet-deploy on Freenode.
+For bugs, please use the github issues tracker for this project. To discuss usage or development of trigger, please join me on #trebuchet-deploy on Freenode.
