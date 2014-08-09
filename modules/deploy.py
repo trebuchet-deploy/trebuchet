@@ -8,6 +8,8 @@ import re
 import urllib
 import os
 import json
+import pwd
+import salt
 
 
 def _get_redis_serv():
@@ -117,6 +119,9 @@ def get_config(repo):
     # checkout_submodules determines whether or not this repo should
     # recursively fetch and checkout submodules.
     config.setdefault('checkout_submodules', False)
+    # If gitfat_enabled is true, git-fat will be initiliazed and
+    # git-fat pull will be run on each target as part of the checkout.
+    config.setdefault('gitfat_enabled', False)
     # dependencies are a set of repositories that should be fetched
     # and checked out before this repo. This is a deprecated feature.
     config.setdefault('dependencies', {})
@@ -185,6 +190,42 @@ def deployment_server_init():
                 status = __salt__['cmd.retcode'](cmd, runas=deploy_user,
                                                  umask=002,
                                                  cwd=config['location'])
+
+                # http will likely be used as deploy targets' remote transport.
+                # submodules don't know how to work properly via http
+                # remotes unless info/refs and other files are up to date.
+                # This will call git update-server-info for each of the
+                # checkouts inside of the .git/modules/<modulename> directory.
+                cmd = ("""git submodule foreach --recursive """
+                       """'cd $(sed "s/^gitdir: //" .git) && """
+                       """git update-server-info'""")
+
+                status = __salt__['cmd.retcode'](cmd, runas=deploy_user,
+                                                 umask=002,
+                                                 cwd=config['location'])
+
+                # Install a post-checkout hook to run update-server-info
+                # for each submodule.  This command needs to be run
+                # every time the repository is changed.
+                hook_directory = os.path.join(
+                    config['location'], '.git', 'hooks'
+                )
+                post_checkout_path = os.path.join(
+                    hook_directory, 'post-checkout'
+                )
+                post_checkout = open(post_checkout_path, 'w')
+                post_checkout.write(cmd + "\n")
+                post_checkout.close()
+                os.chmod(post_checkout_path, 775)
+
+                # we should run this on post-commit too, so just symlink
+                # post-commit to post-checkout
+                post_commit_path = os.path.join(hook_directory, 'post-commit')
+                os.symlink(post_checkout_path, post_commit_path)
+                # chown the hooks to the deploy_user
+                deploy_uid = pwd.getpwnam(deploy_user).pw_uid
+                os.chown(post_checkout_path, deploy_uid, -1)
+                os.lchown(post_commit_path, deploy_uid, -1)
             else:
                 cmd = '/usr/bin/git init %s' % (config['location'])
                 status = __salt__['cmd.retcode'](cmd, runas=deploy_user,
@@ -259,7 +300,15 @@ def _update_gitmodules(config, location, shadow=False):
     gitmodules_list = __salt__['file.find'](location, name='.gitmodules')
     for gitmodules in gitmodules_list:
         gitmodules_dir = os.path.dirname(gitmodules)
-        # First ensure we're working with an unmodified .gitmodules file
+        # Check to see if this is even a repo with submodules. Some repos
+        # have git repositories checked into the repository and kept the
+        # git configuration files when doing so. This will cause our submodule
+        # calls to fail.
+        cmd = '/usr/bin/git submodule status --quiet'
+        status = __salt__['cmd.retcode'](cmd, gitmodules_dir)
+        if status != 0:
+            continue
+        # Ensure we're working with an unmodified .gitmodules file
         cmd = '/usr/bin/git checkout .gitmodules'
         status = __salt__['cmd.retcode'](cmd, gitmodules_dir)
         if status != 0:
@@ -306,6 +355,51 @@ def _update_gitmodules(config, location, shadow=False):
         if status != 0:
             return status
     return 0
+
+
+def _gitfat_installed():
+    return salt.utils.which('git-fat')
+
+
+def _init_gitfat(location):
+    '''
+    Runs git fat init at this location.
+
+    :param location: The location on the filesystem to run git fat init
+    :type location: str
+    '''
+    # if it isn't then initialize it now
+    cmd = '/usr/bin/git fat init'
+    return __salt__['cmd.retcode'](cmd, location)
+
+
+# TODO: git fat gc?
+def _update_gitfat(location):
+    '''
+    Runs git-fat pull at this location.
+    If git fat has not been initialized for the
+    repository at this location, _init_gitfat
+    will be called first.
+
+    :param location: The location on the filesystem to run git fat pull
+    :type location: str
+    :rtype int
+    '''
+
+    # Make sure git fat is installed.
+    if not _gitfat_installed():
+        return 40
+
+    # Make sure git fat is initialized.
+    cmd = '/usr/bin/git config --get filter.fat.smudge'
+    if __salt__['cmd.run'](cmd, location) != 'git-fat filter-smudge':
+        status = _init_gitfat(location)
+        if status != 0:
+            return status
+
+    # Run git fat pull.
+    cmd = '/usr/bin/git fat pull'
+    return __salt__['cmd.retcode'](cmd, location)
 
 
 def _clone(config, location, tag, shadow=False):
@@ -519,6 +613,7 @@ def checkout(repo, reset=False):
     '''
     config = get_config(repo)
     depstats = []
+    status = -1
 
     # Notify the deployment system we started
     _check_in('deploy.checkout', repo)
@@ -600,6 +695,13 @@ def _checkout_location(config, location, tag, reset=False, shadow=False):
         ret = __salt__['cmd.retcode'](cmd, location)
         if ret != 0:
             return 50
+
+    # Trigger git-fat pull if gitfat_enabled
+    if config['gitfat_enabled']:
+        ret = _update_gitfat(location)
+        if ret != 0:
+            return ret
+
     return 0
 
 
