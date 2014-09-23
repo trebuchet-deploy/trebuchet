@@ -28,8 +28,8 @@ Here's the format of the local.sls file:
 _pillar/local.sls_
 ```yaml
 example_profile:
-  key: <your_aws_access_key>
-  key_id: <your_aws_secret_key>
+  keyid: <your_aws_access_key>
+  key: <your_aws_secret_key>
   key_name: <your_aws_ssh_key>
   region: <your_preferred_ec2_region>
   vpc_id: <your_vpc_id>
