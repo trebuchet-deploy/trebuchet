@@ -1,6 +1,3 @@
-include:
-  - common
-
 Ensure saltmaster security group exists:
   boto_secgroup.{{ pillar['orchestration_status'] }}:
     - name: saltmaster
@@ -87,6 +84,7 @@ Ensure saltmaster-testing-iad elb exists:
     - cnames:
         - name: saltmaster-testing.{{ pillar['domain'] }}.
           zone: {{ pillar['domain'] }}.
+    - attributes: []
     - profile: example_profile
 
 Ensure saltmaster-testing-iad-internal elb exists:
@@ -100,7 +98,7 @@ Ensure saltmaster-testing-iad-internal elb exists:
           instance_port: 4506
           elb_protocol: TCP
     - health_check:
-        target: 'TCP:4505/'
+        target: 'TCP:4505'
     {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
     - subnets:
       {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
@@ -115,6 +113,7 @@ Ensure saltmaster-testing-iad-internal elb exists:
     - cnames:
         - name: saltmaster-testing-internal.{{ pillar['domain'] }}.
           zone: {{ pillar['domain'] }}.
+    - attributes: []
     - profile: example_profile
 
 Ensure saltmaster-testing-useast1 asg exists:
@@ -128,7 +127,6 @@ Ensure saltmaster-testing-useast1 asg exists:
       - security_groups:
         - base
         - saltmaster
-        - saltmaster-testing
       # The instance profile name used here should match the instance profile
       # created above.
       - instance_profile_name: saltmaster-testing-useast1
@@ -156,10 +154,15 @@ Ensure saltmaster-testing-useast1 asg exists:
               salt-call --local -c /srv/trebuchet/example state.sls bootstrap
               salt-call --local -c /srv/trebuchet/example state.highstate
     {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
-    - vpc_zone_identifier: {{ salt['pillar.get']('example_profile:vpc_subnets') }}
+    - vpc_zone_identifier:
+      {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
+      - {{ subnet }}
+      {% endfor %}
     {% endif %}
     - availability_zones:
       - us-east-1a
+      - us-east-1d
+      - us-east-1e
     - load_balancers:
       - saltmaster-testing-iad
       - saltmaster-testing-iad-internal

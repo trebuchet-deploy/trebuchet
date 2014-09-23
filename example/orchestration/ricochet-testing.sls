@@ -1,6 +1,3 @@
-include:
-  - common
-
 Ensure ricochet security group exists:
   boto_secgroup.{{ pillar['orchestration_status'] }}:
     - name: ricochet
@@ -77,6 +74,7 @@ Ensure ricochet-testing-iad elb exists:
     - availability_zones:
         - us-east-1a
     {% endif %}
+    - attributes: []
     - profile: example_profile
 
 Ensure ricochet-testing-useast1 asg exists:
@@ -90,7 +88,6 @@ Ensure ricochet-testing-useast1 asg exists:
       - security_groups:
         - base
         - ricochet
-        - ricochet-testing
       # The instance profile name used here should match the instance profile
       # created above.
       - instance_profile_name: ricochet-testing-useast1
@@ -118,10 +115,15 @@ Ensure ricochet-testing-useast1 asg exists:
               salt-call --local -c /srv/trebuchet/example state.sls bootstrap
               salt-call --local -c /srv/trebuchet/example state.highstate
     {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
-    - vpc_zone_identifier: {{ salt['pillar.get']('example_profile:vpc_subnets') }}
+    - vpc_zone_identifier:
+      {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
+      - {{ subnet }}
+      {% endfor %}
     {% endif %}
     - availability_zones:
       - us-east-1a
+      - us-east-1d
+      - us-east-1e
     - load_balancers:
       - ricochet-testing-iad
     - min_size: 1
