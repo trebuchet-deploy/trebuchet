@@ -34,3 +34,8 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+example/.orchestration/*
+!example/.orchestration/minion
+!example/.orchestration/etc/salt/.exists
+example/pillar/local.sls

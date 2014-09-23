@@ -1,0 +1,4 @@
+-e git+https://github.com/trebuchet/ricochet.git@master#egg=TrebuchetRicochet
+boto>=2.29
+redis>=2.4.9
+gunicorn
