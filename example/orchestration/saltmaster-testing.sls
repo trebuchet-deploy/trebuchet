@@ -1,10 +1,8 @@
-{% set orchestration_status = salt['pillar.get']('orchestration_status', 'present') %}
-
 include:
   - common
 
 Ensure saltmaster security group exists:
-  boto_secgroup.{{ orchestration_status }}:
+  boto_secgroup.{{ pillar['orchestration_status'] }}:
     - name: saltmaster
     - description: saltmaster
     - rules:
@@ -19,13 +17,13 @@ Ensure saltmaster security group exists:
           to_port: 4506
           source_group_name: base
     # If using a vpc, specify the ID for the group
-    {% if salt['pillar.get']('example_profile.vpc_id', '') -%}
-    - vpc_id: {{ salt['pillar.get']('example_profile.vpc_id') }}
-    {% endif -%}
+    {% if salt['pillar.get']('example_profile:vpc_id', '') %}
+    - vpc_id: {{ salt['pillar.get']('example_profile:vpc_id') }}
+    {% endif %}
     - profile: example_profile
 
 Ensure saltmaster-testing-useast1 role exists:
-  boto_iam_role.{{ orchestration_status }}:
+  boto_iam_role.{{ pillar['orchestration_status'] }}:
     - policies:
         'bootstrap':
           Version: '2012-10-17'
@@ -69,21 +67,22 @@ Ensure saltmaster-testing-useast1 role exists:
 Ensure saltmaster-testing-iad elb exists:
   boto_elb.present:
     - name: saltmaster-testing-iad
-    - availability_zones:
-        - us-east-1a
     - listeners:
         - elb_port: 80
           instance_port: 80
           elb_protocol: HTTP
     - health_check:
         target: 'HTTP:80/'
-    {% if salt['pillar.get']('example_profile.vpc_subnets', []) -%}
+    {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
     - subnets:
-      {% for subnet in salt['pillar.get']('example_profile.vpc_subnets') %}
+      {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
       - {{ subnet }}
       {% endfor %}
     - security_groups:
         - elb
+    {% else %}
+    - availability_zones:
+        - us-east-1a
     {% endif %}
     - cnames:
         - name: saltmaster-testing.{{ pillar['domain'] }}.
@@ -93,8 +92,6 @@ Ensure saltmaster-testing-iad elb exists:
 Ensure saltmaster-testing-iad-internal elb exists:
   boto_elb.present:
     - name: saltmaster-testing-iad-internal
-    - availability_zones:
-        - us-east-1a
     - listeners:
         - elb_port: 4505
           instance_port: 4505
@@ -104,13 +101,16 @@ Ensure saltmaster-testing-iad-internal elb exists:
           elb_protocol: TCP
     - health_check:
         target: 'TCP:4505/'
-    {% if salt['pillar.get']('example_profile.vpc_subnets', []) -%}
+    {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
     - subnets:
-      {% for subnet in salt['pillar.get']('example_profile.vpc_subnets') %}
+      {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
       - {{ subnet }}
       {% endfor %}
     - security_groups:
         - base
+    {% else %}
+    - availability_zones:
+        - us-east-1a
     {% endif %}
     - cnames:
         - name: saltmaster-testing-internal.{{ pillar['domain'] }}.
@@ -118,13 +118,13 @@ Ensure saltmaster-testing-iad-internal elb exists:
     - profile: example_profile
 
 Ensure saltmaster-testing-useast1 asg exists:
-  boto_asg.{{ orchestration_status }}:
+  boto_asg.{{ pillar['orchestration_status'] }}:
     - name: saltmaster-testing-useast1
     - launch_config_name: saltmaster-testing-useast1
     - launch_config:
       # Free tier eligible AMI, Ubuntu 14.04
       - image_id: ami-864d84ee
-      - key_name: {{ salt['pillar.get']('example_profile.key_name') }}
+      - key_name: {{ salt['pillar.get']('example_profile:key_name') }}
       - security_groups:
         - base
         - saltmaster
@@ -134,7 +134,7 @@ Ensure saltmaster-testing-useast1 asg exists:
       - instance_profile_name: saltmaster-testing-useast1
       - instance_type: t2.micro
       # Use a public ip, if in a vpc
-      {% if salt['pillar.get']('example_profile.vpc_subnets', []) -%}
+      {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
       - associate_public_ip_address: True
       {% endif %}
       - cloud_init:
@@ -155,8 +155,8 @@ Ensure saltmaster-testing-useast1 asg exists:
               export DOMAIN="{{ pillar['domain'] }}"
               salt-call --local -c /srv/trebuchet/example state.sls bootstrap
               salt-call --local -c /srv/trebuchet/example state.highstate
-    {% if salt['pillar.get']('example_profile.vpc_subnets', []) -%}
-    - vpc_zone_identifier: {{ salt['pillar.get']('example_profile.vpc_subnets') }}
+    {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
+    - vpc_zone_identifier: {{ salt['pillar.get']('example_profile:vpc_subnets') }}
     {% endif %}
     - availability_zones:
       - us-east-1a

@@ -8,3 +8,4 @@ pillar_roots:
   base:
     - pillar
 file_client: local
+ipc_mode: tcp

@@ -1,5 +1,5 @@
 Ensure base security group exists:
-  boto_secgroup.{{ infra_state }}:
+  boto_secgroup.{{ pillar['orchestration_status'] }}:
     - name: saltmaster
     - description: saltmaster
     - rules:
@@ -14,7 +14,7 @@ Ensure base security group exists:
     - profile: example_profile
 
 Ensure elb security group exists:
-  boto_secgroup.{{ infra_state }}:
+  boto_secgroup.{{ pillar['orchestration_status'] }}:
     - name: saltmaster
     - description: saltmaster
     - rules:
