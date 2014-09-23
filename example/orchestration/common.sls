@@ -7,6 +7,12 @@ Ensure base security group exists:
           from_port: 4505
           to_port: 4506
           source_group_name: base
+        # You probably want to limit ssh to a bastion host in production,
+        # rather than having it open to the world, like this.
+        - ip_protocol: tcp
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
     # If using a vpc, specify the ID for the group
     {% if salt['pillar.get']('example_profile.vpc_id', '') -%}
     - vpc_id: {{ salt['pillar.get']('example_profile.vpc_id') }}
