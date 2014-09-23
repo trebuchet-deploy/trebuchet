@@ -1,7 +1,7 @@
 Ensure base security group exists:
   boto_secgroup.{{ pillar['orchestration_status'] }}:
-    - name: saltmaster
-    - description: saltmaster
+    - name: base
+    - description: base
     - rules:
         - ip_protocol: tcp
           from_port: 4505
@@ -21,8 +21,8 @@ Ensure base security group exists:
 
 Ensure elb security group exists:
   boto_secgroup.{{ pillar['orchestration_status'] }}:
-    - name: saltmaster
-    - description: saltmaster
+    - name: elb
+    - description: elb
     - rules:
         - ip_protocol: tcp
           from_port: 80

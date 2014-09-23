@@ -148,7 +148,7 @@ Ensure saltmaster-testing-useast1 asg exists:
               
               mkdir -p /srv/salt/venv
               virtualenv --system-site-packages /srv/salt/venv
-              git clone https://github.com/trebuchet-deploy/trebuchet.git /srv/trebuchet
+              git clone -b add-example https://github.com/trebuchet-deploy/trebuchet.git /srv/trebuchet
               . /srv/salt/venv/bin/activate
               pip install -r /srv/trebuchet/requirements.txt
               deactivate
