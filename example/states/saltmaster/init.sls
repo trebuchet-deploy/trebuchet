@@ -8,8 +8,8 @@ Ensure {{ command }} link exists:
 
 Ensure salt-master configuration exists:
   file.managed:
-    - name: /etc/salt/master.d/master
-    - source: salt://saltmaster/config/master
+    - name: /etc/salt/master.d/master.conf
+    - source: salt://saltmaster/config/master.conf
     - makedirs: True
     - listen_in:
       - cmd: Restart salt-master
