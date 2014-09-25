@@ -61,14 +61,14 @@ def _get_name_from_tags():
 def parse_host():
     # Get the grains from the hostname if it's set and matches our convention.
     # Example: saltmaster-testing-useast1-909nui9h.trebuchet-deploy.com
-    name_regex = '^(\w+)-(\w+)-(\w{3})-(\w+)($|\.{1})'
+    name_regex = '^(\w+)-(\w+)-(\w+)-(\w+)($|\.{1})'
     match = re.match(name_regex, salt.utils.network.get_fqhostname())
     if not match:
         # If the hostname wasn't set to our convention, try to fetch the name
         # from the EC2 Name tag.
         if _on_ec2():
             # Example: saltmaster-testing-useast1-03e83d29
-            name_regex = '^(\w+)-(\w+)-(\w{3})-(\w+)'
+            name_regex = '^(\w+)-(\w+)-(\w+)-(\w+)'
             match = re.match(name_regex, _get_name_from_tags())
         else:
             return {}
