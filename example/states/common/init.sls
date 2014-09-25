@@ -27,6 +27,13 @@ Ensure salt virtualenv is managed:
     - requirements: /srv/trebuchet/requirements.txt
     - reload_modules: True
 
+{% for command in ['salt-call', 'salt-minion'] %}
+Ensure {{ command }} link exists:
+  file.symlink:
+    - name: /usr/local/bin/{{ command }}
+    - target: /srv/salt/venv/bin/{{ command }}
+{% endfor %}
+
 Ensure supervisor is installed:
   pkg.installed:
     - name: supervisor

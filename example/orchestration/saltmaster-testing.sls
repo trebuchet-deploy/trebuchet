@@ -151,8 +151,8 @@ Ensure saltmaster-testing-useast1 asg exists:
               pip install -r /srv/trebuchet/requirements.txt
               deactivate
               export DOMAIN="{{ pillar['domain'] }}"
-              salt-call --local -c /srv/trebuchet/example state.sls bootstrap
-              salt-call --local -c /srv/trebuchet/example state.highstate
+              /srv/salt/venv/bin/salt-call --local -c /srv/trebuchet/example state.sls bootstrap
+              /srv/salt/venv/bin/salt-call --local -c /srv/trebuchet/example state.highstate
     {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
     - vpc_zone_identifier:
       {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}

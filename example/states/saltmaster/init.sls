@@ -1,3 +1,11 @@
+{% for command in ['salt', 'salt-api', 'salt-cloud', 'salt-cp', 'salt-key',
+                   'salt-master', 'salt-run', 'salt-ssh', 'salt-syndic', 'salt-unity'] %}
+Ensure {{ command }} link exists:
+  file.symlink:
+    - name: /usr/local/bin/{{ command }}
+    - target: /srv/salt/venv/bin/{{ command }}
+{% endfor %}
+
 Ensure salt-master configuration exists:
   file.managed:
     - name: /etc/salt/master.d/master.conf
