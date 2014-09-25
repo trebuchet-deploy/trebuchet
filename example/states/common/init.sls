@@ -13,11 +13,6 @@ Ensure trebuchet dependencies are installed:
       - git-core
       - python-redis
 
-Ensure salt is configured:
-  file.managed:
-    - name: /etc/salt/minion
-    - source: salt://common/salt/minion
-
 Ensure salt virtualenv is managed:
   virtualenv.managed:
     - name: /srv/salt/venv

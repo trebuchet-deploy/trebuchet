@@ -1,4 +1,5 @@
 master: saltmaster-{{ grains['service_instance'] }}.{{ grains['domain'] }}
+id: {{ grains['fqdn'] }}
 
 # For development purposes, always fail if any state fails. This makes it much
 # easier to ensure first-runs will succeed.
