@@ -3,10 +3,6 @@ Ensure base security group exists:
     - name: base
     - description: base
     - rules:
-        - ip_protocol: tcp
-          from_port: 4505
-          to_port: 4506
-          source_group_name: base
         # You probably want to limit ssh to a bastion host in production,
         # rather than having it open to the world, like this.
         - ip_protocol: tcp

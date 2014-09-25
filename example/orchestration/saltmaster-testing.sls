@@ -12,7 +12,21 @@ Ensure saltmaster security group exists:
         - ip_protocol: tcp
           from_port: 4505
           to_port: 4506
+          source_group_name: saltmaster
+        # 4505 and 4506 are for salt-master
+        - ip_protocol: tcp
+          from_port: 4505
+          to_port: 4506
           source_group_name: base
+        - ip_protocol: tcp
+          from_port: 6379
+          to_port: 6379
+          source_group_name: base
+        # 6379 is for redis
+        - ip_protocol: tcp
+          from_port: 6379
+          to_port: 6379
+          source_group_name: saltmaster
     # If using a vpc, specify the ID for the group
     {% if salt['pillar.get']('example_profile:vpc_id', '') %}
     - vpc_id: {{ salt['pillar.get']('example_profile:vpc_id') }}
@@ -97,6 +111,9 @@ Ensure saltmaster-testing-iad-internal elb exists:
         - elb_port: 4506
           instance_port: 4506
           elb_protocol: TCP
+        - elb_port: 6379
+          instance_port: 6379
+          elb_protocol: TCP
     - health_check:
         target: 'TCP:4505'
     {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
@@ -105,7 +122,7 @@ Ensure saltmaster-testing-iad-internal elb exists:
       - {{ subnet }}
       {% endfor %}
     - security_groups:
-        - base
+        - saltmaster
     {% else %}
     - availability_zones:
         - us-east-1a
@@ -114,6 +131,7 @@ Ensure saltmaster-testing-iad-internal elb exists:
         - name: saltmaster-testing-internal.{{ pillar['domain'] }}.
           zone: {{ pillar['domain'] }}.
     - attributes: []
+    - scheme: internal
     - profile: example_profile
 
 Ensure saltmaster-testing-useast1 asg exists:
