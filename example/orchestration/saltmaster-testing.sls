@@ -13,15 +13,6 @@ Ensure saltmaster security group exists:
           from_port: 4505
           to_port: 4506
           source_group_name: saltmaster
-        # 4505 and 4506 are for salt-master
-        - ip_protocol: tcp
-          from_port: 4505
-          to_port: 4506
-          source_group_name: base
-        - ip_protocol: tcp
-          from_port: 6379
-          to_port: 6379
-          source_group_name: base
         # 6379 is for redis
         - ip_protocol: tcp
           from_port: 6379
