@@ -23,7 +23,7 @@ Ensure salt-master auto_accept configuration exists:
 Ensure salt-master supervisor configuration exists:
   file.managed:
     - name: /etc/supervisor/conf.d/salt-master.conf
-    - source: salt://common/supervisor/salt-master.conf
+    - source: salt://saltmaster/supervisor/salt-master.conf
     - listen_in:
       - cmd: Conditionally reload supervisor
 
