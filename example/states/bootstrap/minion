@@ -1,0 +1,14 @@
+failhard: True
+state_output: mixed
+state_verbose: False
+log_level: info
+file_client: local
+local: True
+file_roots:
+  base:
+    - /srv/trebuchet/example/states
+pillar_roots:
+  base:
+    - /srv/trebuchet/example/pillar
+grains_dirs:
+  - /srv/trebuchet/example/grains
