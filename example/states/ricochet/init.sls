@@ -12,7 +12,8 @@ Ensure ricochet venv is managed:
 Ensure ricochet supervisor configuration exists:
   file.managed:
     - name: /etc/supervisor/conf.d/ricochet.conf
-    - source: salt://common/supervisor/ricochet.conf
+    - source: salt://ricochet/supervisor/ricochet.conf
+    - template: jinja
     - listen_in:
       - cmd: Conditionally reload supervisor
 
