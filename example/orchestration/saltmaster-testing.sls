@@ -1,5 +1,5 @@
 Ensure saltmaster security group exists:
-  boto_secgroup.{{ pillar['orchestration_status'] }}:
+  boto_secgroup.{{ pillar.orchestration_status }}:
     - name: saltmaster
     - description: saltmaster
     - rules:
@@ -18,11 +18,11 @@ Ensure saltmaster security group exists:
           from_port: 6379
           to_port: 6379
           source_group_name: saltmaster
-    - vpc_id: {{ salt['pillar.get']('example_profile:vpc_id') }}
+    - vpc_id: {{ pillar.example_profile.vpc_id }}
     - profile: example_profile
 
 Ensure saltmaster-testing-useast1 role exists:
-  boto_iam_role.{{ pillar['orchestration_status'] }}:
+  boto_iam_role.{{ pillar.orchestration_status }}:
     - policies:
         'bootstrap':
           Version: '2012-10-17'
@@ -73,14 +73,14 @@ Ensure saltmaster-testing-iad elb exists:
     - health_check:
         target: 'HTTP:80/'
     - subnets:
-      {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
+      {% for subnet in pillar.example_profile.vpc_subnets %}
       - {{ subnet }}
       {% endfor %}
     - security_groups:
         - elb
     - cnames:
-        - name: saltmaster-testing.{{ pillar['domain'] }}.
-          zone: {{ pillar['domain'] }}.
+        - name: saltmaster-testing.{{ pillar.domain }}.
+          zone: {{ pillar.domain }}.
     - attributes: []
     - profile: example_profile
 
@@ -100,27 +100,29 @@ Ensure saltmaster-testing-iad-internal elb exists:
     - health_check:
         target: 'TCP:4505'
     - subnets:
-      {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
+      {% for subnet in pillar.example_profile.vpc_subnets %}
       - {{ subnet }}
       {% endfor %}
     - security_groups:
         - saltmaster
     - cnames:
-        - name: saltmaster-testing-internal.{{ pillar['domain'] }}.
-          zone: {{ pillar['domain'] }}.
+        - name: saltmaster-testing-internal.{{ pillar.domain }}.
+          zone: {{ pillar.domain }}.
     - attributes: []
     - scheme: internal
     - profile: example_profile
 
 Ensure saltmaster-testing-useast1 asg exists:
-  boto_asg.{{ pillar['orchestration_status'] }}:
+  boto_asg.{{ pillar.orchestration_status }}:
     - name: saltmaster-testing-useast1
+    {% if pillar.orchestration_status == 'absent' %}
     - force: True
+    {% endif %}
     - launch_config_name: saltmaster-testing-useast1
     - launch_config:
       # Free tier eligible AMI, Ubuntu 14.04
       - image_id: ami-864d84ee
-      - key_name: {{ salt['pillar.get']('example_profile:key_name') }}
+      - key_name: {{ pillar.example_profile.key_name }}
       - security_groups:
         - base
         - saltmaster
@@ -145,11 +147,11 @@ Ensure saltmaster-testing-useast1 asg exists:
               . /srv/salt/venv/bin/activate
               pip install -r /srv/trebuchet/requirements.txt
               deactivate
-              export DOMAIN="{{ pillar['domain'] }}"
+              export DOMAIN="{{ pillar.domain }}"
               /srv/salt/venv/bin/salt-call --local -c /srv/trebuchet/example/states/common/salt state.sls bootstrap
               /srv/salt/venv/bin/salt-call state.highstate
     - vpc_zone_identifier:
-      {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
+      {% for subnet in pillar.example_profile.vpc_subnets %}
       - {{ subnet }}
       {% endfor %}
     - availability_zones:

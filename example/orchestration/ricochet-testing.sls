@@ -1,5 +1,5 @@
 Ensure ricochet security group exists:
-  boto_secgroup.{{ pillar['orchestration_status'] }}:
+  boto_secgroup.{{ pillar.orchestration_status }}:
     - name: ricochet
     - description: ricochet
     - rules:
@@ -8,11 +8,11 @@ Ensure ricochet security group exists:
           to_port: 80
           source_group_name: elb
     # If using a vpc, specify the ID for the group
-    - vpc_id: {{ salt['pillar.get']('example_profile:vpc_id') }}
+    - vpc_id: {{ pillar.example_profile.vpc_id }}
     - profile: example_profile
 
 Ensure ricochet-testing-useast1 role exists:
-  boto_iam_role.{{ pillar['orchestration_status'] }}:
+  boto_iam_role.{{ pillar.orchestration_status }}:
     - policies:
         'bootstrap':
           Version: '2012-10-17'
@@ -61,7 +61,7 @@ Ensure ricochet-testing-iad elb exists:
     - health_check:
         target: 'HTTP:80/'
     - subnets:
-      {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
+      {% for subnet in pillar.example_profile.vpc_subnets %}
       - {{ subnet }}
       {% endfor %}
     # Security groups on ELBs are VPC only
@@ -71,9 +71,11 @@ Ensure ricochet-testing-iad elb exists:
     - profile: example_profile
 
 Ensure ricochet-testing-useast1 asg exists:
-  boto_asg.{{ pillar['orchestration_status'] }}:
+  boto_asg.{{ pillar.orchestration_status }}:
     - name: ricochet-testing-useast1
+    {% if pillar.orchestration_status == 'absent' %}
     - force: True
+    {% endif %}
     - launch_config_name: ricochet-testing-useast1
     - launch_config:
       # Free tier eligible AMI, Ubuntu 14.04
@@ -107,7 +109,7 @@ Ensure ricochet-testing-useast1 asg exists:
               /srv/salt/venv/bin/salt-call --local -c /srv/trebuchet/example/states/common/salt state.sls bootstrap
               /srv/salt/venv/bin/salt-call state.highstate
     - vpc_zone_identifier:
-      {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
+      {% for subnet in pillar.example_profile.vpc_subnets %}
       - {{ subnet }}
       {% endfor %}
     - availability_zones:
