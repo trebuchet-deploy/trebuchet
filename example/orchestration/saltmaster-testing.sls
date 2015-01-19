@@ -115,6 +115,7 @@ Ensure saltmaster-testing-iad-internal elb exists:
 Ensure saltmaster-testing-useast1 asg exists:
   boto_asg.{{ pillar['orchestration_status'] }}:
     - name: saltmaster-testing-useast1
+    - force: True
     - launch_config_name: saltmaster-testing-useast1
     - launch_config:
       # Free tier eligible AMI, Ubuntu 14.04
@@ -145,8 +146,8 @@ Ensure saltmaster-testing-useast1 asg exists:
               pip install -r /srv/trebuchet/requirements.txt
               deactivate
               export DOMAIN="{{ pillar['domain'] }}"
-              /srv/salt/venv/bin/salt-call --local -c /srv/trebuchet/example/states/bootstrap state.sls bootstrap
-              /srv/salt/venv/bin/salt-call --local -c /srv/trebuchet/example/states/bootstrap state.highstate
+              /srv/salt/venv/bin/salt-call --local -c /srv/trebuchet/example/states/common/salt state.sls bootstrap
+              /srv/salt/venv/bin/salt-call state.highstate
     - vpc_zone_identifier:
       {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
       - {{ subnet }}

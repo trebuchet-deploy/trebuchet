@@ -73,6 +73,7 @@ Ensure ricochet-testing-iad elb exists:
 Ensure ricochet-testing-useast1 asg exists:
   boto_asg.{{ pillar['orchestration_status'] }}:
     - name: ricochet-testing-useast1
+    - force: True
     - launch_config_name: ricochet-testing-useast1
     - launch_config:
       # Free tier eligible AMI, Ubuntu 14.04
