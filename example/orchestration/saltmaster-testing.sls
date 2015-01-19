@@ -18,10 +18,7 @@ Ensure saltmaster security group exists:
           from_port: 6379
           to_port: 6379
           source_group_name: saltmaster
-    # If using a vpc, specify the ID for the group
-    {% if salt['pillar.get']('example_profile:vpc_id', '') %}
     - vpc_id: {{ salt['pillar.get']('example_profile:vpc_id') }}
-    {% endif %}
     - profile: example_profile
 
 Ensure saltmaster-testing-useast1 role exists:
@@ -75,17 +72,12 @@ Ensure saltmaster-testing-iad elb exists:
           elb_protocol: HTTP
     - health_check:
         target: 'HTTP:80/'
-    {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
     - subnets:
       {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
       - {{ subnet }}
       {% endfor %}
     - security_groups:
         - elb
-    {% else %}
-    - availability_zones:
-        - us-east-1a
-    {% endif %}
     - cnames:
         - name: saltmaster-testing.{{ pillar['domain'] }}.
           zone: {{ pillar['domain'] }}.
@@ -107,17 +99,12 @@ Ensure saltmaster-testing-iad-internal elb exists:
           elb_protocol: TCP
     - health_check:
         target: 'TCP:4505'
-    {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
     - subnets:
       {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
       - {{ subnet }}
       {% endfor %}
     - security_groups:
         - saltmaster
-    {% else %}
-    - availability_zones:
-        - us-east-1a
-    {% endif %}
     - cnames:
         - name: saltmaster-testing-internal.{{ pillar['domain'] }}.
           zone: {{ pillar['domain'] }}.
@@ -141,9 +128,7 @@ Ensure saltmaster-testing-useast1 asg exists:
       - instance_profile_name: saltmaster-testing-useast1
       - instance_type: t2.micro
       # Use a public ip, if in a vpc
-      {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
       - associate_public_ip_address: True
-      {% endif %}
       - cloud_init:
           scripts:
             salt: |
@@ -162,12 +147,10 @@ Ensure saltmaster-testing-useast1 asg exists:
               export DOMAIN="{{ pillar['domain'] }}"
               /srv/salt/venv/bin/salt-call --local -c /srv/trebuchet/example/states/bootstrap state.sls bootstrap
               /srv/salt/venv/bin/salt-call --local -c /srv/trebuchet/example/states/bootstrap state.highstate
-    {% if salt['pillar.get']('example_profile:vpc_subnets', []) %}
     - vpc_zone_identifier:
       {% for subnet in salt['pillar.get']('example_profile:vpc_subnets') %}
       - {{ subnet }}
       {% endfor %}
-    {% endif %}
     - availability_zones:
       - us-east-1a
       - us-east-1d
