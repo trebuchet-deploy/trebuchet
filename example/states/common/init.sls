@@ -8,7 +8,7 @@ Ensure human user {{ name }} exist:
     - createhome: True
     - password: '*'
     - fullname: {{ user.full_name }}
-    {% user.get('disabled', False) %}
+    {% if user.get('disabled', False) %}
     - expire: 1
     {% endif %}
 
@@ -96,8 +96,8 @@ Conditionally reload supervisor:
 
 Ensure salt-minion configuration exists:
   file.managed:
-    - name: /etc/salt/minion.conf
-    - source: salt://common/salt/minion.conf
+    - name: /etc/salt/minion
+    - source: salt://common/salt/minion
     - template: jinja
     - makedirs: True
     - listen_in:
