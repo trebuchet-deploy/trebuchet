@@ -96,8 +96,8 @@ Conditionally reload supervisor:
 
 Ensure salt-minion configuration exists:
   file.managed:
-    - name: /etc/salt/minion
-    - source: salt://common/salt/minion
+    - name: /etc/salt/minion.conf
+    - source: salt://common/salt/minion.conf
     - template: jinja
     - makedirs: True
     - listen_in:
