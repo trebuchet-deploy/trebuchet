@@ -22,3 +22,5 @@ Ensure hostname is set:
     - name: hostname {{ hostname }}
     - unless: hostname | grep {{ hostname }}
     - reload_modules: True
+
+{% include 'common/init.sls' %}
