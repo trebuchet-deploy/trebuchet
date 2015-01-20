@@ -1,4 +1,4 @@
-{% for name, user in pillar['users'].items() %}
+{% for name, user in pillar.get('users', {}).items() %}
 Ensure human user {{ name }} exist:
   user.present:
     - name: {{ name }}
