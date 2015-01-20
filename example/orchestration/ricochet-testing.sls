@@ -68,6 +68,9 @@ Ensure ricochet-testing-iad elb exists:
     - security_groups:
         - elb
     - attributes: []
+    - cnames:
+        - name: ricochet-testing.{{ pillar.domain }}.
+          zone: {{ pillar.domain }}.
     - profile: example_profile
 
 Ensure ricochet-testing-useast1 asg exists:

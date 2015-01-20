@@ -21,6 +21,6 @@ Ensure hostname is set:
   cmd.run:
     - name: hostname {{ hostname }}
     - unless: hostname | grep {{ hostname }}
-    - reload_modules: True
+    - reload_grains: True
 
 {% include 'common/init.sls' %}
